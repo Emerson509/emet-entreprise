@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion - Emet Entreprise</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #0b1220; color: #fff;
+           display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    form { background: #151f35; padding: 28px; border-radius: 12px; width: 90%; max-width: 340px; }
+    h1 { font-size: 20px; margin-top: 0; }
+    input, button { width: 100%; padding: 12px; margin-top: 12px; border-radius: 8px; border: none; font-size: 16px; box-sizing: border-box; }
+    button { background: #2f7cf6; color: #fff; cursor: pointer; }
+    a { color: #7fb2ff; font-size: 14px; display: block; margin-top: 14px; text-align: center; }
+    #message { color: #ff7b7b; margin-top: 12px; min-height: 20px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <form id="loginForm">
+    <h1>Connexion client</h1>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Mot de passe" required>
+    <button type="submit">Se connecter</button>
+    <div id="message"></div>
+    <a href="register.html">Créer un compte</a>
+  </form>
+
+  <script type="module">
+    import { auth } from "./firebase-config.js";
+    import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+    const form = document.getElementById("loginForm");
+    const message = document.getElementById("message");
+
+    // Si le client a été renvoyé ici parce que son compte n'est pas encore approuvé
+    if (new URLSearchParams(window.location.search).get("attente") === "1") {
+      message.textContent = "Ton compte est en attente de validation.";
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      message.textContent = "";
+      try {
+        await signInWithEmailAndPassword(
+          auth,
+          document.getElementById("email").value,
+          document.getElementById("password").value
+        );
+        window.location.href = "index.html"; // guard.js vérifiera l'approbation
+      } catch (erreur) {
+        message.textContent = "Email ou mot de passe incorrect.";
+      }
+    });
+  </script>
+</body>
+</html>
